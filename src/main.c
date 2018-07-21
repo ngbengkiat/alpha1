@@ -32,10 +32,6 @@ int main(void){
 
    	//ReadDataFromFlash();
 
-    //StartCMUCAM(4, 57600);
-
-  //  PrintCamValues();
-   // CAM_to_WinM3();
     TestMotorMenu();
 	MainMenu();
 

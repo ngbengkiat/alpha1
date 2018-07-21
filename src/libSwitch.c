@@ -23,13 +23,13 @@ void InitSwitch() {
 	GPIO_Init(USER_SW_PORT, &GPIO_InitStructure);
 }
 
-#define SW_HIGH				0
-#define SW_DEBOUNCE_HIGH	1
-#define SW_LOW				2
-#define SW_DEBOUNCE_LOW		3
+#define SW_RELEASE			0
+#define SW_DEBOUNCE_PRESS	1
+#define SW_PRESS			2
+#define SW_DEBOUNCE_RELEASE	3
 #define SW_DEBOUNCE_TIME	10
 volatile int16_t sw_State;
-volatile int16_t sw_low_time;
+volatile int16_t sw_press_time;
 int16_t sw_debounce_time;
 volatile bool bSWFlag;
 
@@ -43,42 +43,42 @@ void User_sw_service(void) {
 		sw_debounce_time--;
 		return;
 	}
-	if (USER_SW) {
-		// switch pin is high
-		if (sw_State==SW_LOW) {
-			sw_State = SW_DEBOUNCE_HIGH;
+	if (USER_SW == USER_SW_CLOSED) {
+		// switch is pressed
+		if (sw_State==SW_PRESS) {
+			sw_State = SW_DEBOUNCE_PRESS;
 			sw_debounce_time = SW_DEBOUNCE_TIME;
 		}
-		else if (sw_State == SW_DEBOUNCE_HIGH){
+		else if (sw_State == SW_DEBOUNCE_PRESS){
 			// after debouncing, switch is still high. So the high state is true.
-			sw_State = SW_HIGH;
+			sw_State = SW_RELEASE;
 		}
 	} else {
-		// switch pin is low
+		// switch is released
 
-		if (sw_State==SW_HIGH) {
-			sw_State = SW_DEBOUNCE_LOW;
+		if (sw_State==SW_RELEASE) {
+			sw_State = SW_DEBOUNCE_RELEASE;
 			sw_debounce_time = SW_DEBOUNCE_TIME;
 		}
-		else if (sw_State == SW_DEBOUNCE_LOW){
+		else if (sw_State == SW_DEBOUNCE_RELEASE){
 			// after debouncing, switch is still low. So the low state is true.
-			sw_State = SW_LOW;
-			sw_low_time=0;
+			sw_State = SW_PRESS;
+			sw_press_time=0;
 			bSWFlag = TRUE;
 		}
 		else {
 			// increment the low state time.
 			// This is use to check how long the switch is pressed.
-			sw_low_time++;
+			sw_press_time++;
 		}
 	}
 }
 
 void WaitSW(void) {
-	while(sw_State!=SW_LOW)
+	while(sw_State!=SW_PRESS)
 		;
 	DelaymSec(10);
-	while(sw_State!=SW_HIGH)
+	while(sw_State!=SW_RELEASE)
 		;
 	DelaymSec(10);
 
@@ -92,9 +92,9 @@ int16_t ReadSWSpecial(void) {
 
 	bEncoderClickFlag=FALSE;
 
-	while(sw_State!=SW_HIGH)
+	while(sw_State!=SW_RELEASE)
 		;
-	while(sw_State!=SW_LOW) {
+	while(sw_State!=SW_PRESS) {
 		if (bEncoderClickFlag) {
 			// Use encoder to change values
 			return encoderClickType;
@@ -107,25 +107,25 @@ int16_t ReadSWSpecial(void) {
 
 
 	ret = 0;
-	while(sw_State==SW_LOW) {
-		if (sw_low_time<400)
+	while(sw_State==SW_PRESS) {
+		if (sw_press_time<400)
 			// short press
 			ret = 0;
-		else if (sw_low_time<800) {
+		else if (sw_press_time<800) {
 			// long press, 1 blink
 			if (ret == 0) {
 				ret = 1;
 				DispBlink();
 			}
 		}
-		else if (sw_low_time<1200) {
+		else if (sw_press_time<1200) {
 			if (ret == 1) {
 				// very long press, 2 blinks
 				ret = 2;
 				DispBlink();
 			}
 		}
-		else if (sw_low_time<1600) {
+		else if (sw_press_time<1600) {
 			if (ret == 2) {
 				// very long press, 3 blinks
 				ret = 3;

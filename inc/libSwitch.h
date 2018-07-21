@@ -8,6 +8,8 @@
 #ifndef LIBSWITCH_H_
 #define LIBSWITCH_H_
 
+#define USER_SW_CLOSED	Bit_RESET
+#define USER_SW_OPENED	Bit_SET
 #define USER_SW_PORT	GPIOC				// Change port pin here!
 #define USER_SW_PIN		GPIO_Pin_15
 #define USER_SW		GPIO_ReadInputDataBit(USER_SW_PORT,USER_SW_PIN)
