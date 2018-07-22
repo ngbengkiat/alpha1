@@ -21,7 +21,7 @@ int main(void){
 	clrscr();
 
 
-   	puts("I'm originalclone! hehe");
+   	puts("I'm alpha1 repository! hehe");
 
    	printf("\np%d %d %d %d", CNT_PER_CM, CNT_PER_CM_PER_MS, CNT_PER_360DEG, DIST_deg_oc(360));
    	printf("\na%d %d %d %d", SPEED_deg_oc(360), ACC_deg_oc(360), SPEED_mm_oc(1000), ACC_mm_oc(1000));
