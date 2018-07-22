@@ -18,4 +18,5 @@ extern void InitSwitch(void);
 extern int16_t ReadSWSpecial(void);
 extern void WaitSW(void);
 extern void User_sw_service(void);
+
 #endif /* LIBSWITCH_H_ */
